@@ -125,13 +125,13 @@ export default function Home() {
             <textarea
               id="inquiry"
               className="form-textarea"
-              placeholder="e.g. Stag do for 15 lads, long weekend in Benidorm, July, need accommodation + activities + bar packages. Budget around £500 per head."
+              placeholder="e.g. Stag do for 15 lads, long weekend in Benidorm, July, need accommodation + activities + bar packages + breakfast. Budget around £500 per head."
               value={inquiry}
               onChange={(e) => setInquiry(e.target.value)}
               disabled={loading}
             />
             <p className="form-hint">
-              Drop in the details — who, how many, where, when, budget. The more the merrier!
+              Drop in the details — who, how many, where, when, budget, breakfast yes/no?. The more the merrier!
             </p>
 
             <p className="form-examples-label">🍻 Quick examples:</p>
