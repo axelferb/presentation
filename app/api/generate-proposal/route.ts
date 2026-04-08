@@ -1,31 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateText } from "ai";
+import { generateObject } from "ai";
 import { createGroq } from "@ai-sdk/groq";
 import { createProposal } from "@/lib/proposales";
 
 const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
-const SYSTEM_PROMPT = `You are an expert hospitality sales writer for Axels Beer @ Breakfast — a lads' holiday experience brand. Your job is to transform a brief client inquiry into a fun, energetic, and professional proposal structure.
+const SYSTEM_PROMPT = `You are a sales writer for Axels Beer @ Breakfast, a lads holiday brand. Given a client inquiry, return ONLY a raw JSON object with no markdown, no code blocks, no backticks, no newlines inside string values.
 
-Given an inquiry, return ONLY a valid JSON object (no markdown, no explanation) with this shape:
-
-{
-  "title_md": "string — a punchy, fun proposal title that fits the Axels B@B brand",
-  "description_md": "string — an upbeat proposal description using markdown. Use # for headers, * for bold. 3–4 paragraphs covering: enthusiastic intro, what's included, why it'll be legendary, and a clear next step CTA.",
-  "language": "en",
-  "recipient": {
-    "first_name": "string or null",
-    "last_name": "string or null",
-    "email": "string or null",
-    "company_name": "string or null"
-  }
-}
-
-Write in a fun, laddish but professional voice. Be specific — pull details from the inquiry. If recipient details aren't mentioned, set those fields to null.`;
+Return exactly this shape:
+{"title_md":"short punchy title here","description_md":"3-4 sentences describing the package in a fun laddish tone. No line breaks. No special characters.","language":"en"}`;
 
 export async function POST(req: NextRequest) {
   try {
-    const { inquiry } = await req.json();
+    const { inquiry, recipient } = await req.json();
 
     if (!inquiry || typeof inquiry !== "string" || inquiry.trim().length < 10) {
       return NextResponse.json(
@@ -34,26 +21,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Step 1: Use Vercel AI SDK to call Claude
-    const { text: rawText } = await generateText({
+    const { object: rawDraft } = await generateObject({
       model: groq("llama-3.3-70b-versatile"),
+      output: "no-schema",
       system: SYSTEM_PROMPT,
-      prompt: `Here is the client inquiry:\n\n${inquiry}`,
-      maxTokens: 1024,
+      prompt: `Client inquiry: ${inquiry}`,
+      maxTokens: 512,
     });
 
-    let draft;
-    try {
-      const cleaned = rawText.replace(/```json|```/g, "").trim();
-      draft = JSON.parse(cleaned);
-    } catch {
-      return NextResponse.json(
-        { error: "Failed to parse AI response. Please try again." },
-        { status: 500 }
-      );
-    }
+    const obj = rawDraft as Record<string, unknown>;
 
-    // Step 2: Create the proposal in Proposales
+    const draft = {
+      title_md: String(obj.title_md || "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim(),
+      description_md: String(obj.description_md || "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim(),
+      language: String(obj.language || "en"),
+      recipient,
+    };
+
+    console.log("Sending to Proposales:", JSON.stringify(draft));
+
     const proposal = await createProposal(draft);
 
     return NextResponse.json({
@@ -66,7 +52,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err: unknown) {
-    console.error("Error generating proposal:", err);
+    console.error("Error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }

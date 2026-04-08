@@ -8,6 +8,7 @@ export interface ProposalDraft {
     first_name?: string;
     last_name?: string;
     email?: string;
+    phone?: string;
     company_name?: string;
   };
 }
@@ -25,14 +26,29 @@ export async function createProposal(
 
   if (!apiKey) throw new Error("PROPOSALES_API_KEY is not set");
   if (!companyId) throw new Error("PROPOSALES_COMPANY_ID is not set");
+  // Only include recipient fields that have actual string values
+  const recipientFields = draft.recipient
+    ? Object.fromEntries(
+        Object.entries(draft.recipient).filter(
+          ([, v]) => typeof v === "string" && v.trim() !== ""
+        )
+      )
+    : {};
 
-  const body = {
-    company_id: parseInt(companyId, 10),
-    language: draft.language || "en",
+  const body: Record<string, unknown> = {
+    company_id: parseInt(companyId),
+    language: "en",
     title_md: draft.title_md,
     description_md: draft.description_md,
-    ...(draft.recipient ? { recipient: draft.recipient } : {}),
   };
+
+  // Only attach recipient if we have at least one real field
+  if (Object.keys(recipientFields).length > 0) {
+    body.recipient = recipientFields;
+  }
+
+  // Log what we're sending to help debug
+  console.log("Sending to Proposales:", JSON.stringify(body, null, 2));
 
   const res = await fetch(`${PROPOSALES_BASE_URL}/v3/proposals`, {
     method: "POST",
@@ -43,13 +59,13 @@ export async function createProposal(
     body: JSON.stringify(body),
   });
 
+  const responseText = await res.text();
+  console.log("Proposales response:", res.status, responseText);
+
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(
-      `Proposales API error ${res.status}: ${errorText}`
-    );
+    throw new Error(`Proposales API error ${res.status}: ${responseText}`);
   }
 
-  const data = await res.json();
+  const data = JSON.parse(responseText);
   return data.proposal as CreatedProposal;
 }

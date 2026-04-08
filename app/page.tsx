@@ -9,6 +9,13 @@ const EXAMPLES = [
   "Corporate team jolly, 30 blokes, 2 nights Amsterdam, pub tour + dinner",
 ];
 
+interface Recipient {
+  first_name: string;
+  last_name: string;
+  email: string;
+  company_name: string;
+}
+
 interface ProposalResult {
   url: string;
   uuid: string;
@@ -18,10 +25,20 @@ interface ProposalResult {
 
 export default function Home() {
   const [inquiry, setInquiry] = useState("");
+  const [recipient, setRecipient] = useState<Recipient>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    company_name: "",
+  });
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState("");
   const [result, setResult] = useState<ProposalResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handleRecipientChange = (field: keyof Recipient, value: string) => {
+    setRecipient((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async () => {
     if (!inquiry.trim() || loading) return;
@@ -32,12 +49,12 @@ export default function Home() {
     try {
       setLoadingStep("Getting the lads together...");
       await new Promise((r) => setTimeout(r, 700));
-      setLoadingStep("Claude's writing up the proposal, hold tight...");
+      setLoadingStep("Writing up the proposal, hold tight...");
 
       const res = await fetch("/api/generate-proposal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inquiry }),
+        body: JSON.stringify({ inquiry, recipient }),
       });
 
       setLoadingStep("Sending it over to Proposales...");
@@ -60,6 +77,7 @@ export default function Home() {
     setResult(null);
     setError(null);
     setInquiry("");
+    setRecipient({ first_name: "", last_name: "", email: "", company_name: "" });
   };
 
   return (
@@ -95,6 +113,8 @@ export default function Home() {
       <main className="main">
         {!result ? (
           <div className="form-card">
+
+            {/* Inquiry */}
             <label className="form-label" htmlFor="inquiry">
               🎉 What&apos;s the occasion?
             </label>
@@ -122,6 +142,61 @@ export default function Home() {
                   {ex}
                 </button>
               ))}
+            </div>
+
+            <div className="divider" />
+
+            {/* Recipient */}
+            <p className="form-label">👤 Who&apos;s it for? <span className="form-label-optional">(optional)</span></p>
+            <div className="recipient-grid">
+              <div className="input-group">
+                <label className="input-label" htmlFor="first_name">First Name</label>
+                <input
+                  id="first_name"
+                  className="form-input"
+                  type="text"
+                  placeholder="John"
+                  value={recipient.first_name}
+                  onChange={(e) => handleRecipientChange("first_name", e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              <div className="input-group">
+                <label className="input-label" htmlFor="last_name">Last Name</label>
+                <input
+                  id="last_name"
+                  className="form-input"
+                  type="text"
+                  placeholder="Smith"
+                  value={recipient.last_name}
+                  onChange={(e) => handleRecipientChange("last_name", e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              <div className="input-group">
+                <label className="input-label" htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  className="form-input"
+                  type="email"
+                  placeholder="john@example.com"
+                  value={recipient.email}
+                  onChange={(e) => handleRecipientChange("email", e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              <div className="input-group">
+                <label className="input-label" htmlFor="company_name">Company</label>
+                <input
+                  id="company_name"
+                  className="form-input"
+                  type="text"
+                  placeholder="Lads Inc."
+                  value={recipient.company_name}
+                  onChange={(e) => handleRecipientChange("company_name", e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
 
             <div className="divider" />
@@ -198,7 +273,7 @@ export default function Home() {
           <div className="step">
             <span className="step-emoji">🤖</span>
             <h4>AI Does the Work</h4>
-            <p>Claude writes a proper proposal so you don&apos;t have to.</p>
+            <p>Llama writes a proper proposal so you don&apos;t have to.</p>
           </div>
           <div className="step">
             <span className="step-emoji">🍺</span>
@@ -214,7 +289,7 @@ export default function Home() {
         Built with{" "}
         <a href="https://proposales.com" target="_blank" rel="noopener noreferrer">Proposales</a>
         {" & "}
-        <a href="https://anthropic.com" target="_blank" rel="noopener noreferrer">Claude AI</a>
+        <a href="https://groq.com" target="_blank" rel="noopener noreferrer">Groq AI</a>
         {" · Hosted on Vercel"}
       </footer>
     </div>
