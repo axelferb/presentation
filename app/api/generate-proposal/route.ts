@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
 import { createProposal } from "@/lib/proposales";
+
+const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are an expert hospitality sales writer for Axels Beer @ Breakfast — a lads' holiday experience brand. Your job is to transform a brief client inquiry into a fun, energetic, and professional proposal structure.
 
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Use Vercel AI SDK to call Claude
     const { text: rawText } = await generateText({
-      model: google("gemini-2.0-flash"),
+      model: groq("llama-3.3-70b-versatile"),
       system: SYSTEM_PROMPT,
       prompt: `Here is the client inquiry:\n\n${inquiry}`,
       maxTokens: 1024,
