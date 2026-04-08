@@ -4,6 +4,7 @@ export interface ProposalDraft {
   title_md: string;
   description_md: string;
   language: string;
+  blocks?: { type: string; content_id: number; quantity: number }[];
   recipient?: {
     first_name?: string;
     last_name?: string;
@@ -41,6 +42,10 @@ export async function createProposal(
     title_md: draft.title_md,
     description_md: draft.description_md,
   };
+
+  if (draft.blocks && draft.blocks.length > 0) {
+    body.blocks = draft.blocks;
+  }
 
   // Only attach recipient if we have at least one real field
   if (Object.keys(recipientFields).length > 0) {

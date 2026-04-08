@@ -25,6 +25,8 @@ interface ProposalResult {
 
 export default function Home() {
   const [inquiry, setInquiry] = useState("");
+  const [arrivalDate, setArrivalDate] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
   const [recipient, setRecipient] = useState<Recipient>({
     first_name: "",
     last_name: "",
@@ -54,7 +56,7 @@ export default function Home() {
       const res = await fetch("/api/generate-proposal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inquiry, recipient }),
+        body: JSON.stringify({ inquiry, arrivalDate, departureDate, recipient }),
       });
 
       setLoadingStep("Sending it over to Proposales...");
@@ -77,6 +79,8 @@ export default function Home() {
     setResult(null);
     setError(null);
     setInquiry("");
+    setArrivalDate("");
+    setDepartureDate("");
     setRecipient({ first_name: "", last_name: "", email: "", company_name: "" });
   };
 
@@ -142,6 +146,35 @@ export default function Home() {
                   {ex}
                 </button>
               ))}
+            </div>
+
+            <div className="divider" />
+
+            {/* Dates */}
+            <p className="form-label">📅 When are the dates? <span className="form-label-optional">(optional)</span></p>
+            <div className="recipient-grid">
+              <div className="input-group">
+                <label className="input-label" htmlFor="arrival_date">Arrival Date</label>
+                <input
+                  id="arrival_date"
+                  className="form-input"
+                  type="date"
+                  value={arrivalDate}
+                  onChange={(e) => setArrivalDate(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              <div className="input-group">
+                <label className="input-label" htmlFor="departure_date">Departure Date</label>
+                <input
+                  id="departure_date"
+                  className="form-input"
+                  type="date"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
 
             <div className="divider" />
