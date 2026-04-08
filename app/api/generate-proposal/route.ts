@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
 import { createProposal } from "@/lib/proposales";
 
 const SYSTEM_PROMPT = `You are an expert hospitality sales writer for Axels Beer @ Breakfast — a lads' holiday experience brand. Your job is to transform a brief client inquiry into a fun, energetic, and professional proposal structure.
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Use Vercel AI SDK to call Claude
     const { text: rawText } = await generateText({
-      model: anthropic("claude-haiku-4-5-20251001"),
+      model: google("gemini-1.5-flash"),
       system: SYSTEM_PROMPT,
       prompt: `Here is the client inquiry:\n\n${inquiry}`,
       maxTokens: 1024,

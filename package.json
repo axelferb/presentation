@@ -8,11 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "15.0.7",
+    "next": "15.0.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "ai": "^4.0.0",
-    "@ai-sdk/anthropic": "^1.0.0"
+    "@ai-sdk/google": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
