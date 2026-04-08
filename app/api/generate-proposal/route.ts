@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Use Vercel AI SDK to call Claude
     const { text: rawText } = await generateText({
-      model: google("gemini-1.5-flash"),
+      model: google("gemini-2.0-flash"),
       system: SYSTEM_PROMPT,
       prompt: `Here is the client inquiry:\n\n${inquiry}`,
       maxTokens: 1024,
