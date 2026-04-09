@@ -11,7 +11,8 @@ Return exactly this shape:
 {"title_md":"short punchy title here","description_md":"3-4 sentences describing the package in a fun laddish tone. No line breaks. No special characters.","language":"en","num_people":15,"include_breakfast":false}
 
 For num_people, extract the number of people from the inquiry. If you cannot determine it, use 1.
-For include_breakfast, set to true if the inquiry mentions breakfast, otherwise false.`;
+For include_breakfast, set to true if the inquiry mentions breakfast, otherwise false.
+If a recipient first name is provided, address them by name naturally somewhere in the description_md (e.g. "Hey John, ...").`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
     const datePart = [
       arrivalDate ? `Arrival date: ${arrivalDate}` : "",
       departureDate ? `Departure date: ${departureDate}` : "",
+      recipient?.first_name ? `Recipient first name: ${recipient.first_name}` : "",
     ].filter(Boolean).join("\n");
 
     const { object: rawDraft } = await generateObject({
