@@ -59,8 +59,6 @@ export async function POST(req: NextRequest) {
       recipient,
     };
 
-    console.log("Sending to Proposales:", JSON.stringify(draft));
-
     const proposal = await createProposal(draft);
 
     return NextResponse.json({

@@ -52,9 +52,6 @@ export async function createProposal(
     body.recipient = recipientFields;
   }
 
-  // Log what we're sending to help debug
-  console.log("Sending to Proposales:", JSON.stringify(body, null, 2));
-
   const res = await fetch(`${PROPOSALES_BASE_URL}/v3/proposals`, {
     method: "POST",
     headers: {
@@ -65,7 +62,6 @@ export async function createProposal(
   });
 
   const responseText = await res.text();
-  console.log("Proposales response:", res.status, responseText);
 
   if (!res.ok) {
     throw new Error(`Proposales API error ${res.status}: ${responseText}`);
