@@ -94,7 +94,6 @@ export default function Home() {
             <img src="/logo.png" alt="Axels Beer @ Breakfast" />
           </div>
           <span className="header-tagline">Makes A Lad Glad! 🍺</span>
-          <span className="header-badge">⚡ AI Powered</span>
         </div>
       </header>
 
