@@ -3,10 +3,11 @@
 import { useState } from "react";
 
 const EXAMPLES = [
-  "Stag do for 12 lads, 3 nights in Malaga, beach activities + bar crawl",
+  "Stag do for 12 lads, beach activities + bar crawl",
   "Birthday weekend for 20 guys, Ibiza villa, pool party + club nights",
-  "Golf trip for 8 mates, 4 days Portugal, accommodation + tee times needed",
-  "Corporate team jolly, 30 blokes, 2 nights Amsterdam, pub tour + dinner",
+  "Golf trip for 8 mates, accommodation + tee times needed",
+  "Corporate team jolly, 10 blokes, pub tour + dinner, no breakfast",
+  "Surf trip for 2 lads, surf lessons + beach house + breakfast"
 ];
 
 interface Recipient {
