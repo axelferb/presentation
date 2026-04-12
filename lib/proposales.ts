@@ -64,7 +64,8 @@ export async function createProposal(
   const responseText = await res.text();
 
   if (!res.ok) {
-    throw new Error(`Proposales API error ${res.status}: ${responseText}`);
+    console.error(`Proposales API error ${res.status}: ${responseText}`);
+    throw new Error("Something went wrong while creating the proposal. Please try again later.");
   }
 
   const data = JSON.parse(responseText);
